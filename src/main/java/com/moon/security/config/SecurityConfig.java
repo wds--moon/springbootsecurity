@@ -66,17 +66,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
 
                 /**
-                 * 替换默认登录页面
+                 * 替换默认登录过滤器
                  */
                 .and().addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .formLogin() //使用自带的登录
                 .permitAll()
+                /**
+                 * 登录失败
+                 */
                 .failureHandler(authenticationFailureHandler)
+                /**
+                 * 登录成功
+                 */
                 .successHandler(authenticationSuccessHandler)
+                /**
+                 * 未登录
+                 */
                 .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                /**
+                 * 退出登录处理
+                 */
                 .and().logout().logoutSuccessHandler(logoutSuccessHandler).permitAll();
         http.cors().disable();
-        //开启模拟请求，比如API POST测试工具的测试，不开启时，API POST为报403错误
+        //csrf 是否开启
         http.csrf().disable();
 
     }
