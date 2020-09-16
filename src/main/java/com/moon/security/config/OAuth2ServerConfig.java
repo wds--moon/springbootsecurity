@@ -1,6 +1,7 @@
 package com.moon.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 @Configuration
@@ -49,9 +51,12 @@ public class OAuth2ServerConfig {
     @EnableAuthorizationServer
     protected static class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
+        /**
+         * 手动指定了redis
+         */
         @Autowired
-        RedisConnectionFactory redisConnectionFactory;
-
+        @Qualifier("redisTokenStore")
+        private TokenStore tokenStore;
         @Autowired
         private AuthenticationManager authenticationManager;
 
@@ -75,7 +80,7 @@ public class OAuth2ServerConfig {
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints
-                    .tokenStore(new RedisTokenStore(redisConnectionFactory))
+                    .tokenStore(tokenStore)
                     .authenticationManager(authenticationManager);
         }
 
